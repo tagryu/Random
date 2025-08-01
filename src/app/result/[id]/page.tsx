@@ -2,6 +2,7 @@
 
 import { useParams } from 'next/navigation';
 import { useState, useEffect } from 'react';
+import Link from 'next/link';
 import ResultDisplay from '@/components/ResultDisplay';
 import { AllocationResult } from '@/types';
 
@@ -30,12 +31,12 @@ export default function ResultPage() {
           </svg>
           <h1 className="text-3xl font-bold text-gray-800 mb-4">오류 발생</h1>
           <p className="text-gray-600 mb-6">{error}</p>
-          <a
+          <Link
             href="/"
             className="inline-block px-6 py-3 bg-gradient-to-r from-blue-600 to-blue-700 text-white font-semibold rounded-xl hover:from-blue-700 hover:to-blue-800 transition-all transform hover:scale-105 shadow-lg"
           >
             홈으로 돌아가기
-          </a>
+          </Link>
         </div>
       </main>
     );
@@ -67,7 +68,7 @@ export default function ResultPage() {
         
         <div className="max-w-4xl mx-auto space-y-6">
           <ResultDisplay result={result} />
-          <a
+          <Link
             href="/"
             className="block w-full py-4 px-6 bg-gradient-to-r from-gray-600 to-gray-700 text-white font-bold rounded-xl hover:from-gray-700 hover:to-gray-800 transition-all transform hover:scale-105 shadow-lg text-center"
           >
@@ -75,7 +76,7 @@ export default function ResultPage() {
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
             </svg>
             새로운 배정 시작
-          </a>
+          </Link>
         </div>
       </div>
     </main>
