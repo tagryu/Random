@@ -5,6 +5,7 @@ import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import ResultDisplay from '@/components/ResultDisplay';
 import { AllocationResult } from '@/types';
+import { getAllocation } from '@/lib/api';
 
 export default function ResultPage() {
   const params = useParams();
@@ -12,14 +13,32 @@ export default function ResultPage() {
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    try {
+    const fetchResult = async () => {
       const id = params.id as string;
-      const decodedData = atob(id);
-      const parsedResult = JSON.parse(decodedData) as AllocationResult;
-      setResult(parsedResult);
-    } catch (err) {
-      setError('잘못된 공유 링크입니다.');
-    }
+      
+      // 6자리 짧은 ID로 판단
+      if (id.length === 6) {
+        // DB에서 조회
+        console.log('Fetching from Supabase with ID:', id);
+        const data = await getAllocation(id);
+        if (data) {
+          setResult(data);
+        } else {
+          setError('배정 결과를 찾을 수 없습니다. Supabase 테이블을 확인해주세요.');
+        }
+      } else {
+        // 기존 base64 형식 (하위 호환성)
+        try {
+          const decodedData = atob(id);
+          const parsedResult = JSON.parse(decodedData) as AllocationResult;
+          setResult(parsedResult);
+        } catch (err) {
+          setError('잘못된 공유 링크입니다.');
+        }
+      }
+    };
+    
+    fetchResult();
   }, [params.id]);
 
   if (error) {
@@ -57,8 +76,8 @@ export default function ResultPage() {
   }
 
   return (
-    <main className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50">
-      <div className="container mx-auto px-4 py-8">
+    <main className="min-h-screen bg-gray-50">
+      <div className="container mx-auto px-2 py-8">
         <div className="text-center mb-12">
           <h1 className="text-5xl font-black text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-purple-600 mb-4">
             조 배정 결과
@@ -66,8 +85,8 @@ export default function ResultPage() {
           <p className="text-gray-600 text-lg">공유된 조 배정 결과를 확인하세요</p>
         </div>
         
-        <div className="max-w-4xl mx-auto space-y-6">
-          <ResultDisplay result={result} />
+        <div className="w-full space-y-6">
+          <ResultDisplay result={result} skipSave={true} />
           <Link
             href="/"
             className="block w-full py-4 px-6 bg-gradient-to-r from-gray-600 to-gray-700 text-white font-bold rounded-xl hover:from-gray-700 hover:to-gray-800 transition-all transform hover:scale-105 shadow-lg text-center"
