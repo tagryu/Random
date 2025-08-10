@@ -1,7 +1,7 @@
 "use client";
 
 import { AllocationResult } from '@/types';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { saveAllocation } from '@/lib/api';
 import { addToHistory } from '@/lib/storage';
 import QRCode from 'react-qr-code';
@@ -15,9 +15,9 @@ interface ResultDisplayProps {
 
 export default function ResultDisplay({ result, onReAllocate, skipSave = false, existingShortId }: ResultDisplayProps) {
   const [searchTerm, setSearchTerm] = useState('');
-  const [isSaved, setIsSaved] = useState(false);
   const [shareUrl, setShareUrl] = useState<string | null>(null);
   const [showQRModal, setShowQRModal] = useState(false);
+  const hasSaved = useRef(false);
   
   useEffect(() => {
     // 기존 shortId가 있으면 그것을 사용
@@ -28,13 +28,13 @@ export default function ResultDisplay({ result, onReAllocate, skipSave = false, 
     }
     
     // skipSave가 false이고 아직 저장하지 않았을 때만 저장
-    if (!skipSave && !isSaved) {
+    if (!skipSave && !hasSaved.current) {
+      hasSaved.current = true; // 즉시 플래그 설정하여 중복 실행 방지
       const saveResult = async () => {
         const shortId = await saveAllocation(result);
         if (shortId) {
           // LocalStorage에도 저장
           addToHistory(shortId, result);
-          setIsSaved(true);
           const url = `${window.location.origin}/result/${shortId}`;
           setShareUrl(url);
         } else {
@@ -46,7 +46,6 @@ export default function ResultDisplay({ result, onReAllocate, skipSave = false, 
           // 로컬 히스토리에는 짧은 ID로 저장
           const shortId = encodedData.slice(0, 8);
           addToHistory(shortId, result);
-          setIsSaved(true);
         }
       };
       saveResult();
@@ -54,7 +53,7 @@ export default function ResultDisplay({ result, onReAllocate, skipSave = false, 
       // 결과 페이지에서는 현재 URL을 사용
       setShareUrl(window.location.href);
     }
-  }, [result, isSaved, skipSave, existingShortId]);
+  }, [skipSave, existingShortId]); // result를 의존성에서 제거
 
 
   const filteredGroups = Object.entries(result.groups).reduce((acc, [groupName, members]) => {

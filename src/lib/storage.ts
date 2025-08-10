@@ -44,26 +44,14 @@ export function addToHistory(shortId: string, result: AllocationResult): void {
   try {
     const history = getHistory();
     
-    // 이미 같은 shortId가 존재하면 추가하지 않음
+    // 이미 같은 shortId가 존재하면 추가하지 않음 (같은 배정 결과의 중복 저장 방지)
     if (history.some(h => h.shortId === shortId)) {
       console.log('History item with shortId already exists:', shortId);
       return;
     }
     
-    // 동일한 이름과 시간대(1분 이내)의 배정이 있는지 확인
     const now = new Date();
-    const oneMinuteAgo = new Date(now.getTime() - 60000);
     const title = result.name || `${result.stats.totalMembers}명 → ${Object.keys(result.groups).length}개 조`;
-    
-    const isDuplicate = history.some(h => {
-      const historyDate = new Date(h.createdAt);
-      return h.title === title && historyDate > oneMinuteAgo;
-    });
-    
-    if (isDuplicate) {
-      console.log('Duplicate allocation detected within 1 minute:', title);
-      return;
-    }
     
     const newItem: AllocationHistory = {
       id: generateUUID(),

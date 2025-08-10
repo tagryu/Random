@@ -15,6 +15,7 @@ export default function AllocationForm({ onAllocationComplete }: AllocationFormP
   const [totalMembers, setTotalMembers] = useState<number>(0);
   const [isLoading, setIsLoading] = useState(false);
   const [allocationName, setAllocationName] = useState<string>('');
+  const [selectedLocation, setSelectedLocation] = useState<string>('광야의샘 3층');
 
   const handleMembersChange = (newMembers: Member[]) => {
     setMembers(newMembers);
@@ -36,10 +37,8 @@ export default function AllocationForm({ onAllocationComplete }: AllocationFormP
     
     setTimeout(() => {
       const result = allocateMembers(members, targetGroups);
-      // 이름 추가
-      if (allocationName.trim()) {
-        result.name = allocationName.trim();
-      }
+      // 선택된 장소를 이름으로 사용
+      result.name = selectedLocation;
       onAllocationComplete(result);
       setIsLoading(false);
     }, 500);
@@ -52,17 +51,33 @@ export default function AllocationForm({ onAllocationComplete }: AllocationFormP
   return (
     <div className="space-y-8">
       <div>
-        <label htmlFor="allocation-name" className="block text-sm font-semibold text-gray-700 mb-3">
-          배정 이름 (선택사항)
+        <label className="block text-sm font-semibold text-gray-700 mb-3">
+          장소 선택
         </label>
-        <input
-          id="allocation-name"
-          type="text"
-          value={allocationName}
-          onChange={(e) => setAllocationName(e.target.value)}
-          placeholder="예: 2024년 1학기 프로젝트 팀"
-          className="w-full px-4 py-3 bg-gray-50 border-2 border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
-        />
+        <div className="grid grid-cols-2 gap-4">
+          <button
+            type="button"
+            onClick={() => setSelectedLocation('광야의샘 3층')}
+            className={`px-6 py-3 rounded-xl font-medium transition-all ${
+              selectedLocation === '광야의샘 3층'
+                ? 'bg-blue-600 text-white shadow-lg transform scale-105'
+                : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+            }`}
+          >
+            광야의샘 3층
+          </button>
+          <button
+            type="button"
+            onClick={() => setSelectedLocation('GCC')}
+            className={`px-6 py-3 rounded-xl font-medium transition-all ${
+              selectedLocation === 'GCC'
+                ? 'bg-blue-600 text-white shadow-lg transform scale-105'
+                : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+            }`}
+          >
+            GCC
+          </button>
+        </div>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">

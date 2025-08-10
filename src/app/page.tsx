@@ -32,14 +32,16 @@ export default function Home() {
     <main className="min-h-screen bg-gray-50">
       <div className="container mx-auto px-2 py-8">
         <div className="text-center mb-12">
-          <Image 
-            src="/design_asset/title.png" 
-            alt="랜덤 조 배정 서비스" 
-            width={600} 
-            height={120}
-            className="mx-auto"
-            priority
-          />
+          <div className="bg-white rounded-2xl shadow-lg p-8 max-w-3xl mx-auto">
+            <Image 
+              src="/design_asset/title.png" 
+              alt="랜덤 조 배정 서비스" 
+              width={600} 
+              height={120}
+              className="mx-auto"
+              priority
+            />
+          </div>
         </div>
         
         <div className="w-full">

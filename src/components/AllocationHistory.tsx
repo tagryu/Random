@@ -12,6 +12,8 @@ interface AllocationHistoryProps {
 export default function AllocationHistoryComponent({ onSelectHistory, onSelectShortId }: AllocationHistoryProps) {
   const [history, setHistory] = useState<AllocationHistory[]>([]);
   const [showConfirmClear, setShowConfirmClear] = useState(false);
+  const [password, setPassword] = useState('');
+  const [showPasswordError, setShowPasswordError] = useState(false);
 
   useEffect(() => {
     setHistory(getHistory());
@@ -25,9 +27,15 @@ export default function AllocationHistoryComponent({ onSelectHistory, onSelectSh
   };
 
   const handleClearAll = () => {
-    clearHistory();
-    setHistory([]);
-    setShowConfirmClear(false);
+    if (password === '0000') {
+      clearHistory();
+      setHistory([]);
+      setShowConfirmClear(false);
+      setPassword('');
+      setShowPasswordError(false);
+    } else {
+      setShowPasswordError(true);
+    }
   };
 
   const formatDate = (dateString: string) => {
@@ -69,8 +77,21 @@ export default function AllocationHistoryComponent({ onSelectHistory, onSelectSh
       </div>
 
       {showConfirmClear && (
-        <div className="mb-4 p-3 bg-red-50 rounded-lg border border-red-200">
-          <p className="text-sm text-red-800 mb-2">정말로 모든 기록을 삭제하시겠습니까?</p>
+        <div className="mb-4 p-4 bg-red-50 rounded-lg border border-red-200">
+          <p className="text-sm text-red-800 mb-3">모든 기록을 삭제하려면 비밀번호를 입력하세요.</p>
+          <input
+            type="password"
+            value={password}
+            onChange={(e) => {
+              setPassword(e.target.value);
+              setShowPasswordError(false);
+            }}
+            placeholder="비밀번호 입력"
+            className="w-full px-3 py-2 mb-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500"
+          />
+          {showPasswordError && (
+            <p className="text-xs text-red-600 mb-2">비밀번호가 틀렸습니다.</p>
+          )}
           <div className="flex gap-2">
             <button
               onClick={handleClearAll}
@@ -79,7 +100,11 @@ export default function AllocationHistoryComponent({ onSelectHistory, onSelectSh
               삭제
             </button>
             <button
-              onClick={() => setShowConfirmClear(false)}
+              onClick={() => {
+                setShowConfirmClear(false);
+                setPassword('');
+                setShowPasswordError(false);
+              }}
               className="px-3 py-1 bg-gray-200 text-gray-700 text-sm rounded hover:bg-gray-300"
             >
               취소

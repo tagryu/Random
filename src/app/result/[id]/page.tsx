@@ -3,6 +3,7 @@
 import { useParams } from 'next/navigation';
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import ResultDisplay from '@/components/ResultDisplay';
 import { AllocationResult } from '@/types';
 import { getAllocation } from '@/lib/api';
@@ -79,10 +80,16 @@ export default function ResultPage() {
     <main className="min-h-screen bg-gray-50">
       <div className="container mx-auto px-2 py-8">
         <div className="text-center mb-12">
-          <h1 className="text-5xl font-black text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-purple-600 mb-4">
-            조 배정 결과
-          </h1>
-          <p className="text-gray-600 text-lg">공유된 조 배정 결과를 확인하세요</p>
+          <div className="bg-white rounded-2xl shadow-lg p-8 max-w-3xl mx-auto">
+            <Image 
+              src="/design_asset/title.png" 
+              alt="랜덤 조 배정 서비스" 
+              width={600} 
+              height={120}
+              className="mx-auto"
+              priority
+            />
+          </div>
         </div>
         
         <div className="w-full space-y-6">
