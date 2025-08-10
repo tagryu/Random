@@ -9,6 +9,7 @@ export interface InputPayload {
 }
 
 export interface AllocationResult {
+  name?: string;
   groups: Record<string, Member[]>;
   unassigned: Member[];
   stats: {

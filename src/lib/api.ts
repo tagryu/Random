@@ -18,6 +18,7 @@ export async function saveAllocation(result: AllocationResult): Promise<string |
     let attempts = 0;
     
     console.log('Saving allocation with shortId:', shortId);
+    console.log('Supabase URL:', process.env.NEXT_PUBLIC_SUPABASE_URL);
     
     // 중복되지 않는 ID 찾기 (최대 5번 시도)
     while (attempts < 5) {
@@ -38,6 +39,7 @@ export async function saveAllocation(result: AllocationResult): Promise<string |
       // 중복 에러가 아니면 실패
       if (error.code !== '23505') {
         console.error('Failed to save allocation:', error);
+        console.error('Error details:', error.message, error.details);
         return null;
       }
       

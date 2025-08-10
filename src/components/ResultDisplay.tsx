@@ -10,15 +10,23 @@ interface ResultDisplayProps {
   result: AllocationResult;
   onReAllocate?: () => void;
   skipSave?: boolean;
+  existingShortId?: string;
 }
 
-export default function ResultDisplay({ result, onReAllocate, skipSave = false }: ResultDisplayProps) {
+export default function ResultDisplay({ result, onReAllocate, skipSave = false, existingShortId }: ResultDisplayProps) {
   const [searchTerm, setSearchTerm] = useState('');
   const [isSaved, setIsSaved] = useState(false);
   const [shareUrl, setShareUrl] = useState<string | null>(null);
   const [showQRModal, setShowQRModal] = useState(false);
   
   useEffect(() => {
+    // 기존 shortId가 있으면 그것을 사용
+    if (existingShortId) {
+      const url = `${window.location.origin}/result/${existingShortId}`;
+      setShareUrl(url);
+      return;
+    }
+    
     // skipSave가 false이고 아직 저장하지 않았을 때만 저장
     if (!skipSave && !isSaved) {
       const saveResult = async () => {
@@ -30,17 +38,23 @@ export default function ResultDisplay({ result, onReAllocate, skipSave = false }
           const url = `${window.location.origin}/result/${shortId}`;
           setShareUrl(url);
         } else {
-          console.error('Failed to save to Supabase');
-          // Supabase 저장 실패 시 알림
-          alert('결과 저장에 실패했습니다. Supabase 설정을 확인해주세요.');
+          console.error('Failed to save to Supabase, using fallback');
+          // Supabase 저장 실패 시 base64 인코딩 방식 사용
+          const encodedData = btoa(encodeURIComponent(JSON.stringify(result)));
+          const url = `${window.location.origin}/result/${encodedData}`;
+          setShareUrl(url);
+          // 로컬 히스토리에는 짧은 ID로 저장
+          const shortId = encodedData.slice(0, 8);
+          addToHistory(shortId, result);
+          setIsSaved(true);
         }
       };
       saveResult();
-    } else if (skipSave) {
+    } else if (skipSave && !existingShortId) {
       // 결과 페이지에서는 현재 URL을 사용
       setShareUrl(window.location.href);
     }
-  }, [result, isSaved, skipSave]);
+  }, [result, isSaved, skipSave, existingShortId]);
 
 
   const filteredGroups = Object.entries(result.groups).reduce((acc, [groupName, members]) => {
@@ -61,14 +75,19 @@ export default function ResultDisplay({ result, onReAllocate, skipSave = false }
     <div className="space-y-6">
       <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
         <div className="flex items-start justify-between mb-5">
-          <h2 className="text-xl font-bold text-gray-900 flex items-center">
-            <div className="w-10 h-10 rounded-full bg-blue-50 flex items-center justify-center mr-3">
-              <svg className="w-6 h-6 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-              </svg>
-            </div>
-            배정 완료
-          </h2>
+          <div>
+            <h2 className="text-xl font-bold text-gray-900 flex items-center">
+              <div className="w-10 h-10 rounded-full bg-blue-50 flex items-center justify-center mr-3">
+                <svg className="w-6 h-6 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+              </div>
+              배정 완료
+            </h2>
+            {result.name && (
+              <p className="text-lg text-gray-700 mt-2 ml-13 font-medium">{result.name}</p>
+            )}
+          </div>
           {shareUrl && (
             <div className="flex items-center gap-3">
               <div className="bg-gray-50 p-3 rounded-xl cursor-pointer hover:bg-gray-100 transition-colors" onClick={() => setShowQRModal(true)}>

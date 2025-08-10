@@ -6,9 +6,10 @@ import { getHistory, removeFromHistory, clearHistory, AllocationHistory } from '
 
 interface AllocationHistoryProps {
   onSelectHistory?: (history: AllocationHistory) => void;
+  onSelectShortId?: (shortId: string) => void;
 }
 
-export default function AllocationHistoryComponent({ onSelectHistory }: AllocationHistoryProps) {
+export default function AllocationHistoryComponent({ onSelectHistory, onSelectShortId }: AllocationHistoryProps) {
   const [history, setHistory] = useState<AllocationHistory[]>([]);
   const [showConfirmClear, setShowConfirmClear] = useState(false);
 

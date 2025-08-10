@@ -14,6 +14,7 @@ export default function AllocationForm({ onAllocationComplete }: AllocationFormP
   const [targetGroups, setTargetGroups] = useState<number>(4);
   const [totalMembers, setTotalMembers] = useState<number>(0);
   const [isLoading, setIsLoading] = useState(false);
+  const [allocationName, setAllocationName] = useState<string>('');
 
   const handleMembersChange = (newMembers: Member[]) => {
     setMembers(newMembers);
@@ -35,6 +36,10 @@ export default function AllocationForm({ onAllocationComplete }: AllocationFormP
     
     setTimeout(() => {
       const result = allocateMembers(members, targetGroups);
+      // 이름 추가
+      if (allocationName.trim()) {
+        result.name = allocationName.trim();
+      }
       onAllocationComplete(result);
       setIsLoading(false);
     }, 500);
@@ -46,6 +51,20 @@ export default function AllocationForm({ onAllocationComplete }: AllocationFormP
 
   return (
     <div className="space-y-8">
+      <div>
+        <label htmlFor="allocation-name" className="block text-sm font-semibold text-gray-700 mb-3">
+          배정 이름 (선택사항)
+        </label>
+        <input
+          id="allocation-name"
+          type="text"
+          value={allocationName}
+          onChange={(e) => setAllocationName(e.target.value)}
+          placeholder="예: 2024년 1학기 프로젝트 팀"
+          className="w-full px-4 py-3 bg-gray-50 border-2 border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+        />
+      </div>
+
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <div>
           <label htmlFor="total-members" className="block text-sm font-semibold text-gray-700 mb-3">
